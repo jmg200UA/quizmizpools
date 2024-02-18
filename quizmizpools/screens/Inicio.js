@@ -9,26 +9,33 @@ import {
     TouchableOpacity,
 } from 'react-native';
 
-function Inicio(props) {
+function Inicio() {
     
-    //const [mostrarComponente, setMostrarComponente] = useState(0);
+    //CODIGO JAVI const [mostrarComponente, setMostrarComponente] = useState(0);
 
     return (
             <ImageBackground 
                 style={styles.background}
                 source={require('../assets/uni1.jpg')}
             >
-            <View style={styles.logoContainer}>                
+            <View style={styles.logoContainer}> 
+                <TouchableOpacity onPress={cambioPagina}>              
                     <Image 
                         style={styles.logo} 
                         source={require('../assets/uni2.jpg')}
                     />    
+                </TouchableOpacity>
                 <Text>QUISMIZPOOLS</Text>
             </View>
             <View style={styles.loginButton}></View>
             <View style={styles.registerButton}></View>
         </ImageBackground>               
     );
+
+    function cambioPagina(){
+        console.log("Cambiamos");
+        //NO FUNCIONA?? return <Prueba/>;
+    }
 }
 
 const styles = StyleSheet.create({
@@ -61,7 +68,7 @@ const styles = StyleSheet.create({
 
 export default Inicio;
 
-/*
+/* CODIGO JAVI 
 <View>
         {mostrarComponente === 0 && (
             <ImageBackground 

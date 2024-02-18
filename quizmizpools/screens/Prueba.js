@@ -18,7 +18,7 @@ import {
 
 
 
-export default function App() {
+function Prueba() {
 
   /*let x=1;
   console.log("El numero es: " + x);*/
@@ -129,3 +129,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+
+export default Prueba;
