@@ -1,11 +1,17 @@
 const express = require('express');
+const cors = require('cors');
+require('dotenv').config()
+const { dbConnection } = require('./database/configdb');
+
 const app = express();
-const port = 3000;
 
-app.get('/', (req, res) => {
-    res.send('¡Hola, mundo!');
-});
+dbConnection();
 
-app.listen(port, () => {
-    console.log(`Servidor escuchando en http://localhost:${port}`);
+app.use(cors()); 
+
+app.use('/usuarios', require('./routes/usuarios'));
+
+
+app.listen(process.env.PORT, () => {
+    console.log("Servidor escuchando en " + process.env.PORT);
 });
