@@ -1,6 +1,6 @@
 const Usuario = require('../models/usuarios');
 
-const getUsuarios = async(req, res) => {
+const obtenerUsuarios = async(req, res) => {
 
     const usuarios = await Usuario.find({});
 
@@ -11,6 +11,33 @@ const getUsuarios = async(req, res) => {
     });
 }
 
+const crearUsuario = async(req, res) => {
+
+    res.json({
+        ok: true,
+        msg: 'crearUsuarios'
+    });
+        
+}
+
+const actualizarUsuario = async(req, res) => {
+
+    res.json({
+        ok: true,
+        msg: 'actualizarUsuario'
+    });
+        
+}
+
+const borrarUsuario = async(req, res) => {
+
+    res.json({
+        ok: true,
+        msg: 'borrarUsuario'
+    });
+        
+}
+
 module.exports = {
-    getUsuarios
+    obtenerUsuarios, crearUsuario, actualizarUsuario, borrarUsuario
 }

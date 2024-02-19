@@ -8,6 +8,7 @@ const app = express();
 dbConnection();
 
 app.use(cors()); 
+app.use(express.json());
 
 app.use('/usuarios', require('./routes/usuarios'));
 
