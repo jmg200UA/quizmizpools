@@ -17,7 +17,6 @@ router.post('/',[
 router.put('/:id',[
     check('nombre','nombre es obligatorio').not().isEmpty(),
     check('email','email es obligatorio').not().isEmpty(),
-    check('password','password es obligatorio').not().isEmpty(),
     check('id','el id no es valido').isMongoId(),
     validarCampos
 ], actualizarUsuario);
