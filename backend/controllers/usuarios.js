@@ -1,4 +1,6 @@
 const Usuario = require('../models/usuarios');
+const {response} = require('express-validator');
+const bcrypt = require('bcryptjs');
 
 const obtenerUsuarios = async(req, res) => {
 
@@ -11,31 +13,116 @@ const obtenerUsuarios = async(req, res) => {
     });
 }
 
-const crearUsuario = async(req, res) => {
+const crearUsuario = async(req, res = response) => {
 
-    res.json({
-        ok: true,
-        msg: 'crearUsuarios'
-    });
-        
+    const {email, password} = req.body;
+
+    try{
+        const existeEmail = await Usuario.findOne({email: email});
+
+        if(existeEmail){
+            return res.status(400).json({
+                ok: false,
+                msg: 'Email ya existe'
+            });
+        }
+
+        const salt = bcrypt.genSaltSync();
+        const c_password = bcrypt.hashSync(password,salt);
+
+        const usuario = new Usuario(req.body);
+        usuario.password = c_password;
+
+        await usuario.save();
+
+        res.json({
+            ok: true,
+            msg: 'Usuario creado',
+            usuario
+        });
+
+    }catch(error){
+        console.log(error);
+        return res.status(400).json({
+            ok: false,
+            msg: 'Error creando usuario'
+        });
+    }       
 }
+
 
 const actualizarUsuario = async(req, res) => {
 
-    res.json({
-        ok: true,
-        msg: 'actualizarUsuario'
-    });
+    const { password, email, ...object} = req.body;
+    const uid = req.params.id;
+
+    try{
+        const existeEmail = await Usuario.findOne({ email: email});
+
+        if(existeEmail){
+            if(existeEmail._id != uid){
+
+                return res.status(400).json({
+                    ok: false,
+                    msg: 'Email ya existe'
+                });
+            }            
+        }
+
+        object.email = email;
+
+        const resultado = await Usuario.findByIdAndUpdate(uid, object, {new: true});
+
+        res.json({
+            ok: true,
+            msg: 'Usuario actualizado',
+            resultado
+        });
+
+    }
+    catch(error){
+        console.log(error);
+
+        return res.status(400).json({
+            ok: false,
+            msg: 'Error actualizando usuario'
+        });
+    }
         
 }
 
 const borrarUsuario = async(req, res) => {
 
-    res.json({
-        ok: true,
-        msg: 'borrarUsuario'
-    });
+    const uid = req.params.id;
+
+    try{
+
+        const existeUsuario = await Usuario.findById(uid);
+
+        if(!existeUsuario){
+
+            return res.status(400).json({
+                ok: false,
+                msg: 'El usuario no existe'
+            });       
+        }
         
+        const resultado = await Usuario.findByIdAndRemove(uid); //PORQUE NO FUNCIONA????
+
+        res.json({
+            ok: true,
+            msg: 'Usuario borrado',
+            resultado
+        });
+
+    }catch(error){
+        console.log(error);
+
+        return res.status(400).json({
+            ok: false,
+            msg: 'Error borrando usuario'
+        });
+    }        
 }
 
 module.exports = {
