@@ -18,7 +18,7 @@ import {
 
 
 
-function Prueba() {
+const Prueba = ({ navigation }) => {
 
   /*let x=1;
   console.log("El numero es: " + x);*/

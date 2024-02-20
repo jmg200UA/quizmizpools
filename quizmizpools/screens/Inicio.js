@@ -9,9 +9,10 @@ import {
     TouchableOpacity,
 } from 'react-native';
 
-function Inicio() {
+const Inicio = ({ navigation }) => {
     
     //CODIGO JAVI const [mostrarComponente, setMostrarComponente] = useState(0);
+    const [mostrarPrueba, setMostrarPrueba] = useState(false);
 
     return (
             <ImageBackground 
@@ -19,7 +20,7 @@ function Inicio() {
                 source={require('../assets/uni1.jpg')}
             >
             <View style={styles.logoContainer}> 
-                <TouchableOpacity onPress={cambioPagina}>              
+                <TouchableOpacity onPress={() => navigation.navigate('Quiniela')}>              
                     <Image 
                         style={styles.logo} 
                         source={require('../assets/uni2.jpg')}
@@ -27,6 +28,7 @@ function Inicio() {
                 </TouchableOpacity>
                 <Text>QUISMIZPOOLS</Text>
             </View>
+
             <View style={styles.loginButton}></View>
             <View style={styles.registerButton}></View>
         </ImageBackground>               
@@ -34,7 +36,7 @@ function Inicio() {
 
     function cambioPagina(){
         console.log("Cambiamos");
-        //NO FUNCIONA?? return <Prueba/>;
+        setMostrarPrueba(true);
     }
 }
 
