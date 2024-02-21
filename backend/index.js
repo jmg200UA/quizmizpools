@@ -11,6 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/usuarios', require('./routes/usuarios'));
+app.use('/ligas', require('./routes/ligas'));
 app.use('/login', require('./routes/login'));
 
 

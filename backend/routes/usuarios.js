@@ -8,14 +8,14 @@ const router = Router();
 router.get('/', obtenerUsuarios);
 
 router.post('/',[
-    check('nombre','nombre es obligatorio').not().isEmpty(),
+    check('nombre','nombre es obligatorio').not().isEmpty().trim(),
     check('email','email es obligatorio').not().isEmpty(),
     check('password','password es obligatorio').not().isEmpty(),
     validarCampos
 ], crearUsuario);
 
 router.put('/:id',[
-    check('nombre','nombre es obligatorio').not().isEmpty(),
+    check('nombre','nombre es obligatorio').not().isEmpty().trim(),
     check('email','email es obligatorio').not().isEmpty(),
     check('id','el id no es valido').isMongoId(),
     validarCampos
