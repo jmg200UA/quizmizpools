@@ -40,7 +40,6 @@ const crearLiga = async(req, res = response) => {
             let listaintegrantesbusqueda = [];
             for(var i=0; i<integrantes.length;i++){
                 if (integrantes[i]!=null) { 
-                    console.log("Integrantes: "+ integrantes[i]);
                     listaintegrantesbusqueda.push(integrantes[i]);
                     listaintegrantesinsertar.push(integrantes[i]);
                 }
@@ -139,7 +138,17 @@ const borrarLiga = async(req, res) => {
             });       
         }
         
-        const resultado = await Liga.findByIdAndRemove(uid); //PORQUE NO FUNCIONA????
+        const resultado = await Liga.findByIdAndDelete(uid);
+        const usuarios = await Usuario.find({});
+
+        for (var i = 0; i < usuarios.length; i++) {
+            for (var j = 0; j < usuarios[i].ligas.length; j++) {
+                if (usuarios[i].ligas[j] == uid) {
+                    usuarios[i].ligas.splice(j, 1);
+                    await usuarios[i].save();
+                }
+            }
+        }
 
         res.json({
             ok: true,

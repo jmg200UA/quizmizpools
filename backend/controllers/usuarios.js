@@ -1,4 +1,5 @@
 const Usuario = require('../models/usuarios');
+const Liga = require('../models/ligas');
 const {response} = require('express-validator');
 const bcrypt = require('bcryptjs');
 
@@ -107,7 +108,21 @@ const borrarUsuario = async(req, res) => {
             });       
         }
         
-        const resultado = await Usuario.findByIdAndRemove(uid); //PORQUE NO FUNCIONA????
+        const resultado = await Usuario.findByIdAndDelete(uid);
+
+        const ligas = await Liga.find({});
+
+        for (var i = 0; i < ligas.length; i++) {
+            for (var j = 0; j < ligas[i].integrantes.length; j++) {
+                if (ligas[i].integrantes[j] == uid) {
+                    ligas[i].integrantes.splice(j, 1);
+                    await ligas[i].save();
+                }
+            }
+            if(ligas[i].integrantes.length<1){
+                await Liga.findByIdAndDelete(ligas[i]._id);
+            }
+        }
 
         res.json({
             ok: true,
