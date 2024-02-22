@@ -7,7 +7,7 @@ const obtenerLigas = async(req, res) => {
 
     try {
 
-        const ligas = await Liga.find({}).populate('__v').populate('integrantes', '-password -__v');
+        const ligas = await Liga.find({}).populate('__v').populate('integrantes', '-password -__v -ligas');
 
         res.json({
             ok: true,
@@ -54,17 +54,27 @@ const crearLiga = async(req, res = response) => {
                     msg: 'Alguno de los usuarios no existen o están repetidos'
                 });
             }
-        }
 
-        const liga = new Liga(req.body);
-        liga.integrantes = listaintegrantesinsertar;
-        await liga.save();
+            const liga = new Liga(req.body);
+            liga.integrantes = listaintegrantesinsertar;
+            await liga.save();
 
-        res.json({
-            ok: true,
-            msg: 'Liga creado',
-            liga
-        }); 
+            for(var i=0; i<existenUsuarios.length;i++){
+                if (existenUsuarios[i]!=null) { 
+                    const usuario = await Usuario.findById(existenUsuarios[i]._id);
+                    usuario.ligas.push(liga._id);
+                    await usuario.save();
+                }
+            }
+            
+
+            res.json({
+                ok: true,
+                msg: 'Liga creado',
+                liga
+            }); 
+        }       
+        
 
     }
     catch(error){

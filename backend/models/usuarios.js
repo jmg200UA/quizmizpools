@@ -16,7 +16,11 @@ const UsuarioSchema = Schema({
     },
     imagen:{
         type: String
-    }
+    },
+    ligas:[{
+        type: Schema.Types.ObjectId,
+        ref: 'Liga'
+    }]
 }, {collection: 'usuarios'});
 
 UsuarioSchema.method('toJSON', function(){

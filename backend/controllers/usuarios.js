@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 
 const obtenerUsuarios = async(req, res) => {
 
-    const usuarios = await Usuario.find({});
+    const usuarios = await Usuario.find({}).populate('__v').populate('ligas', '-__v -integrantes');
 
     res.json({
         ok: true,
