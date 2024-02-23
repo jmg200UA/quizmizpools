@@ -89,6 +89,7 @@ const crearLiga = async(req, res = response) => {
 
 const actualizarLiga = async(req, res) => {
 
+    const { integrantes } = req.body;
     const uid = req.params.id;
 
     try{
@@ -102,14 +103,64 @@ const actualizarLiga = async(req, res) => {
                 msg: 'La liga no existe'
             });       
         }
-        
-        const resultado = await Liga.findByIdAndUpdate(uid, object, {new: true});
 
-        res.json({
-            ok: true,
-            msg: 'Liga actualizada',
-            resultado
-        });
+        let listaintegrantesinsertar = [];
+        
+
+        if (integrantes) {            
+            let listaintegrantesbusqueda = [];
+            for(var i=0; i<integrantes.length;i++){
+                if (integrantes[i]!=null) { 
+                    listaintegrantesbusqueda.push(integrantes[i]);
+                    listaintegrantesinsertar.push(integrantes[i]);
+                }
+            }  
+            
+            const existenUsuarios = await Usuario.find().where('_id').in(listaintegrantesbusqueda);
+
+            if (existenUsuarios.length != listaintegrantesbusqueda.length) {
+                return res.status(400).json({
+                    ok: false,
+                    msg: 'Alguno de los usuarios no existen o están repetidos'
+                });
+            }
+
+            const liga = await Liga.findByIdAndUpdate(uid, req.body, {new: true});
+            
+            liga.integrantes = listaintegrantesinsertar;
+            await liga.save();
+
+            var hayliga = 0;
+
+            console.log("Los usuarios que existen: " + existenUsuarios);
+            for(var i=0; i<existenUsuarios.length;i++){
+                if (existenUsuarios[i]!=null) {
+                    if(existenUsuarios[i].ligas.length<1){
+                        existenUsuarios[i].ligas.push(uid);                                
+                        await existenUsuarios[i].save();
+                    } 
+                    else{
+                        for(var j=0; j<existenUsuarios[i].ligas.length;j++){
+                            if(existenUsuarios[i].ligas[j] == uid){
+                                existenUsuarios[i].ligas[j] = liga;                                                            
+                                await existenUsuarios[i].save();
+                                hayliga=1;
+                            }                 
+                        }                        
+                        if(hayliga==0){
+                            existenUsuarios[i].ligas.push(uid);                                
+                            await existenUsuarios[i].save();
+                        }    
+                    }                   
+                }
+            }            
+
+            res.json({
+                ok: true,
+                msg: 'Liga actualizada',
+                liga
+            });
+        }   
 
     }catch(error){
         console.log(error);
@@ -121,8 +172,16 @@ const actualizarLiga = async(req, res) => {
     }      
         
 }
+/*
+const añadirIntegrante = async(req, res) =>{
 
-const borrarLiga = async(req, res) => {
+}
+
+const borrarIntegrante = async(req, res) =>{
+
+}*/
+
+const borrarLiga = async(req, res) => { 
 
     const uid = req.params.id;
 
@@ -167,5 +226,5 @@ const borrarLiga = async(req, res) => {
 }
 
 module.exports = {
-    obtenerLigas, crearLiga, actualizarLiga, borrarLiga
+    obtenerLigas, crearLiga, actualizarLiga, /*añadirIntegrante, borrarIntegrante,*/ borrarLiga
 }

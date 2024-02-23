@@ -9,10 +9,9 @@ const LigaSchema = Schema({
         type: String
     }, 
     integrantes: [{
-        //usuarios:{
-            type: Schema.Types.ObjectId,
-            ref: 'Usuario'
-        //}
+        type: Schema.Types.ObjectId,
+        ref: 'Usuario',
+        require: true
     }]
     
 }, {collection: 'ligas'});
