@@ -9,9 +9,17 @@ const LigaSchema = Schema({
         type: String
     }, 
     integrantes: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Usuario',
-        require: true
+        usuario: {
+            type: Schema.Types.ObjectId,
+            ref: 'Usuario',
+
+            puntos_por_jornada:[{
+                type: Number
+            }],
+            puntos_totales: {
+                type: Number
+            }
+        },                      
     }]
     
 }, {collection: 'ligas'});

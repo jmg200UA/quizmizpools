@@ -107,7 +107,9 @@ const actualizarLiga = async(req, res) => {
         let listaintegrantesinsertar = [];
         
 
-        if (integrantes) {            
+        if (integrantes) {    
+            console.log("Integrantes: " + integrantes);  
+            console.log("Integrantes1: " + integrantes[0]);       
             let listaintegrantesbusqueda = [];
             for(var i=0; i<integrantes.length;i++){
                 if (integrantes[i]!=null) { 
@@ -132,7 +134,6 @@ const actualizarLiga = async(req, res) => {
 
             var hayliga = 0;
 
-            console.log("Los usuarios que existen: " + existenUsuarios);
             for(var i=0; i<existenUsuarios.length;i++){
                 if (existenUsuarios[i]!=null) {
                     if(existenUsuarios[i].ligas.length<1){
@@ -172,14 +173,6 @@ const actualizarLiga = async(req, res) => {
     }      
         
 }
-/*
-const añadirIntegrante = async(req, res) =>{
-
-}
-
-const borrarIntegrante = async(req, res) =>{
-
-}*/
 
 const borrarLiga = async(req, res) => { 
 
