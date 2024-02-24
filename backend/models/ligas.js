@@ -8,18 +8,27 @@ const LigaSchema = Schema({
     descripcion: {
         type: String
     }, 
-    integrantes: [{
-        usuario: {
+    integrantes: [{  
+        integrante: {      
             type: Schema.Types.ObjectId,
             ref: 'Usuario',
+        },
 
-            puntos_por_jornada:[{
-                type: Number
-            }],
-            puntos_totales: {
-                type: Number
+        jornadas:[{
+            num_jornada: {                
+                type: Number,
+                default: 0
+            },
+            puntos_jornada: {                
+                type: Number,
+                default: 0
             }
-        },                      
+        }],
+
+        puntos_totales: {
+            type: Number,
+            default: 0
+        }                     
     }]
     
 }, {collection: 'ligas'});

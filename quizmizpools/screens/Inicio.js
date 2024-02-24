@@ -7,6 +7,7 @@ import {
     View,
     Text,
     TouchableOpacity,
+    TextInput
 } from 'react-native';
 
 const Inicio = ({ navigation }) => {
@@ -29,8 +30,12 @@ const Inicio = ({ navigation }) => {
                 <Text>QUISMIZPOOLS</Text>
             </View>
 
-            <View style={styles.loginButton}></View>
-            <View style={styles.registerButton}></View>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                <View style={styles.loginButton}>
+                    Login 
+                </View>
+            </TouchableOpacity>
+            <View style={styles.registerButton}>Registro</View>
         </ImageBackground>               
     );
 
@@ -47,9 +52,11 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     loginButton:{
+        color:"#fff", 
         width:"100%",
         height:70,
         backgroundColor: "#fc5c65",
+        alignItems: "center",
     },
     logo:{
         width:100,
@@ -61,9 +68,11 @@ const styles = StyleSheet.create({
         alignItems: "center",       
     },    
     registerButton:{
+        color:"#fff", 
         width:"100%",
         height:70,
         backgroundColor: "#4ecdc4",
+        alignItems: "center",
     }
 })
 

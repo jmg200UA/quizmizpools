@@ -18,22 +18,20 @@ const UsuarioSchema = Schema({
         type: String
     },
     ligas:[{
-        liga: {
-            type: Schema.Types.ObjectId,
-            ref: 'Liga',
+        type: Schema.Types.ObjectId,
+        ref: 'Liga',
 
-            jornadas: [{
-                type: Number, 
+        jornadas: [{
+            type: Number,
 
-                partidos: [{
-                    type: Number,
+            partidos: [{
+                type: Number,
 
-                    resultado: {
-                        type: Number
-                    },
-                }],
-            }], 
-        }
+                resultado: {
+                    type: Number
+                },
+            }],
+        }],
     }]
 }, {collection: 'usuarios'});
 
