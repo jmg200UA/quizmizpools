@@ -32,10 +32,12 @@ const Inicio = ({ navigation }) => {
 
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                 <View style={styles.loginButton}>
-                    Login 
+                    <Text>Login</Text> 
                 </View>
             </TouchableOpacity>
-            <View style={styles.registerButton}>Registro</View>
+            <View style={styles.registerButton}>
+                <Text>Registro</Text>
+            </View>
         </ImageBackground>               
     );
 
