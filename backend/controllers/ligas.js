@@ -1,5 +1,6 @@
 const Liga = require('../models/ligas');
 const Usuario = require('../models/usuarios');
+const mongoose = require('mongoose');
 
 const {response} = require('express-validator');
 
@@ -40,15 +41,16 @@ const crearLiga = async(req, res = response) => {
         if (integrantes) {            
             let listaintegrantesbusqueda = [];
             for(var i=0; i<integrantes.length;i++){
-                console.log("Integrantes liga: " + integrantes[i]);
-                if (integrantes[i]!=null) { 
-                    listaintegrantesbusqueda.push(integrantes[i]);
-                    listaintegrantesinsertar.push(integrantes[i]);
+                console.log("Integrantes liga: " + integrantes[i].integrante);
+                if (integrantes[i]!=null) {
+                    const integranteId = new mongoose.Types.ObjectId(integrantes[i].integrante); 
+                    listaintegrantesbusqueda.push(integranteId);
+                    listaintegrantesinsertar.push(integranteId);
                 }
             }
-
+            
             const existenUsuarios = await Usuario.find().where('_id').in(listaintegrantesbusqueda);
-
+            console.log("Usuarios que existen: " + existenUsuarios);
             if (existenUsuarios.length != listaintegrantesbusqueda.length) {
                 return res.status(400).json({
                     ok: false,
@@ -58,15 +60,23 @@ const crearLiga = async(req, res = response) => {
             console.log("Listaintegrantes: " + listaintegrantesinsertar);
 
             const liga = new Liga(req.body);
-            liga.integrantes.push(listaintegrantesinsertar);
+            liga.integrantes.integrante = listaintegrantesinsertar;
+
+
+            /*for(var i=0;i<liga.integrantes;i++){
+                for(var j=0;j<38;j++){
+                    liga.integrates[i].jornadas[j].num_jornada.push(j);
+                    liga.integrates[i].jornadas[j].puntos_jornada = 0;
+                }
+            }*/
+
             await liga.save();
-
-
+            
 
             for(var i=0; i<existenUsuarios.length;i++){
                 if (existenUsuarios[i]!=null) { 
-                    const usuario = await Usuario.findById(existenUsuarios[i]._id);
-                    usuario.ligas.push(liga._id);
+                    const usuario = await Usuario.findById(existenUsuarios[i]);
+                    usuario.ligas.push(liga);
                     await usuario.save();
                 }
             }
@@ -191,31 +201,31 @@ const actualizarPuntos = async(req,res) => {
         const existeLiga = await Liga.findById(uid);
         const existeUsuario = await Usuario.findById(usu);
 
-        if(!existeLiga){
+        if(!existeLiga || !existeUsuario){
 
             return res.status(400).json({
                 ok: false,
-                msg: 'La liga no existe'
+                msg: 'La liga o el usuario no existe'
             });       
         }
         console.log("Usuario: " + usu);
 
         for(var i=0; i<existeLiga.integrantes.length;i++){
 
-            console.log("Liga integrantes: " + existeLiga.integrantes);
+            console.log("Liga integrantes: " + existeLiga.integrantes[i]);
 
-            if(existeLiga.integrantes[i]._id == usu){
+            if(existeLiga.integrantes[i].integrante == usu){
                 console.log("FUNCIONA");
                 
                 //console.log("ENTRA con integrante: " + existeUsuario);
 
-                puntosAnteriores = existeLiga.integrantes[i].jornada[jornada].puntos_por_jornada;
+                puntosAnteriores = existeLiga.integrantes[i].jornadas[jornada].puntos_jornada;
 
                 console.log("Debe ser 0: " + puntosAnteriores);
 
-                existeLiga.integrantes[i].jornada[jornada].puntos_por_jornada = puntos;
+                existeLiga.integrantes[i].jornadas[jornada].puntos_jornada = puntos;
                 puntosSumar = puntos - puntosAnteriores;     
-                existeLiga.integrantes[i].jornada[jornada].puntos_totales += puntosSumar;    
+                existeLiga.integrantes[i].puntos_totales += puntosSumar;    
                 entra=1;
             }
         }
@@ -226,7 +236,7 @@ const actualizarPuntos = async(req,res) => {
             }); 
         }
 
-               
+        await existeLiga.save();       
 
         res.json({
             ok: true,
@@ -264,7 +274,8 @@ const borrarLiga = async(req, res) => {
 
         for (var i = 0; i < usuarios.length; i++) {
             for (var j = 0; j < usuarios[i].ligas.length; j++) {
-                if (usuarios[i].ligas[j] == uid) {
+                if (usuarios[i].ligas[j].liga == uid) {
+                    console.log("Llegamos para eliminar");
                     usuarios[i].ligas.splice(j, 1);
                     await usuarios[i].save();
                 }
