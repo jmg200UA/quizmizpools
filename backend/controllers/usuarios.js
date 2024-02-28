@@ -114,7 +114,7 @@ const borrarUsuario = async(req, res) => {
 
         for (var i = 0; i < ligas.length; i++) {
             for (var j = 0; j < ligas[i].integrantes.length; j++) {
-                if (ligas[i].integrantes[j] == uid) {
+                if (ligas[i].integrantes[j].integrante == uid) {
                     ligas[i].integrantes.splice(j, 1);
                     await ligas[i].save();
                 }

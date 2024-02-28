@@ -28,7 +28,7 @@ const UsuarioSchema = Schema({
                 type: Number,
                 default: 0
             },
-            resultado: {                
+            resultado: { //ponerlo en liga           
                 type: Number,
                 default: 0
             }

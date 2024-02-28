@@ -61,15 +61,6 @@ const crearLiga = async(req, res = response) => {
 
             const liga = new Liga(req.body);
             liga.integrantes.integrante = listaintegrantesinsertar;
-
-
-            /*for(var i=0;i<liga.integrantes;i++){
-                for(var j=0;j<38;j++){
-                    liga.integrates[i].jornadas[j].num_jornada.push(j);
-                    liga.integrates[i].jornadas[j].puntos_jornada = 0;
-                }
-            }*/
-
             await liga.save();
             
 
@@ -101,10 +92,8 @@ const crearLiga = async(req, res = response) => {
     }
 }
 
-
 const actualizarLiga = async(req, res) => {
 
-    const { integrantes } = req.body;
     const uid = req.params.id;
 
     try{
@@ -118,31 +107,68 @@ const actualizarLiga = async(req, res) => {
                 msg: 'La liga no existe'
             });       
         }
+        const liga = await Liga.findByIdAndUpdate(uid, req.body, {new: true});
 
-        let listaintegrantesinsertar = [];
+        res.json({
+            ok: true,
+            msg: 'Liga actualizada',
+            liga
+        });
+           
+
+    }catch(error){
+        console.log(error);
+
+        return res.status(400).json({
+            ok: false,
+            msg: 'Error actualizando liga'
+        });
+    }      
+        
+}
+
+const sumarIntegrante = async(req, res) => { //COMO LO HACEMOS
+    
+    const uid = req.params.id;
+
+    try{
+        const existeLiga = await Liga.findById(uid);
+
+        if(!existeLiga){
+
+            return res.status(400).json({
+                ok: false,
+                msg: 'La liga no existe'
+            });       
+        }
+        
+
+    let listaintegrantesinsertar = [];
         
 
         if (integrantes) {         
             let listaintegrantesbusqueda = [];
             for(var i=0; i<integrantes.length;i++){
-                if (integrantes[i]!=null) { 
-                    listaintegrantesbusqueda.push(integrantes[i]);
-                    listaintegrantesinsertar.push(integrantes[i]);
+                console.log("Integrantes liga: " + integrantes[i].integrante);
+                if (integrantes[i]!=null) {
+                    const integranteId = new mongoose.Types.ObjectId(integrantes[i].integrante); 
+                    listaintegrantesbusqueda.push(integranteId);
+                    listaintegrantesinsertar.push(integranteId);
                 }
-            }  
+            }
             
-            const existenUsuarios = await Usuario.find().where('_id').in(listaintegrantesbusqueda);
-
+            console.log("Usuarios que existen: " + existenUsuarios);
             if (existenUsuarios.length != listaintegrantesbusqueda.length) {
                 return res.status(400).json({
                     ok: false,
                     msg: 'Alguno de los usuarios no existen o están repetidos'
                 });
             }
+            console.log("Listaintegrantes: " + listaintegrantesinsertar);
 
             const liga = await Liga.findByIdAndUpdate(uid, req.body, {new: true});
             
-            liga.integrantes = listaintegrantesinsertar;
+            liga.integrantes.integrante = listaintegrantesinsertar;
             await liga.save();
 
             var hayliga = 0;
@@ -155,7 +181,7 @@ const actualizarLiga = async(req, res) => {
                     } 
                     else{
                         for(var j=0; j<existenUsuarios[i].ligas.length;j++){
-                            if(existenUsuarios[i].ligas[j] == uid){
+                            if(existenUsuarios[i].ligas[j]._id == uid){
                                 existenUsuarios[i].ligas[j] = liga;                                                            
                                 await existenUsuarios[i].save();
                                 hayliga=1;
@@ -167,14 +193,15 @@ const actualizarLiga = async(req, res) => {
                         }    
                     }                   
                 }
-            }            
+            }
 
             res.json({
                 ok: true,
                 msg: 'Liga actualizada',
                 liga
             });
-        }   
+        }
+       
 
     }catch(error){
         console.log(error);
@@ -182,9 +209,65 @@ const actualizarLiga = async(req, res) => {
         return res.status(400).json({
             ok: false,
             msg: 'Error actualizando liga'
-        });
-    }      
+        });    
+    }
+}
+
+const restarIntegrante = async(req, res) => {
+    
+    const uid = req.params.id;
+    const usuario = req.params.usuario;
+
+    try{
+        const existeLiga = await Liga.findById(uid);
+        const existeUsuario = await Usuario.findById(usuario);
+
+        if(!existeLiga || !existeUsuario){
+
+            return res.status(400).json({
+                ok: false,
+                msg: 'La liga o el usuario no existe'
+            });       
+        }   
         
+        for (var j = 0; j < existeLiga.integrantes.length; j++) {
+            if (existeLiga.integrantes[j].integrante == usuario) {                
+                console.log("Llegamos para eliminar usuario en ligas");
+                existeLiga.integrantes.splice(j, 1);
+                await existeLiga.save();
+            }
+        }
+
+        
+        if(existeLiga.integrantes.length<1){
+            console.log("Ultimo usu adios liga");
+            //Hay que llamar a delete
+        }     
+
+
+        for (var j = 0; j < existeUsuario.ligas.length; j++) {
+            if (existeUsuario.ligas[j]._id == uid) {
+                console.log("Llegamos para eliminar liga en usuarios");
+                existeUsuario.ligas.splice(j, 1);
+                await existeUsuario.save();
+            }
+        }
+
+        res.json({
+            ok: true,
+            msg: 'Integrante eliminado',
+            existeLiga
+        });       
+       
+
+    }catch(error){
+        console.log(error);
+
+        return res.status(400).json({
+            ok: false,
+            msg: 'Error eliminando integrante liga'
+        });    
+    }
 }
 
 const actualizarPuntos = async(req,res) => {
@@ -274,7 +357,9 @@ const borrarLiga = async(req, res) => {
 
         for (var i = 0; i < usuarios.length; i++) {
             for (var j = 0; j < usuarios[i].ligas.length; j++) {
-                if (usuarios[i].ligas[j].liga == uid) {
+                console.log("Usuario liga: " + usuarios[i].ligas[j]);
+                console.log("Liga uid: " + uid);
+                if (usuarios[i].ligas[j]._id == uid) {
                     console.log("Llegamos para eliminar");
                     usuarios[i].ligas.splice(j, 1);
                     await usuarios[i].save();
@@ -299,5 +384,5 @@ const borrarLiga = async(req, res) => {
 }
 
 module.exports = {
-    obtenerLigas, crearLiga, actualizarLiga, actualizarPuntos, borrarLiga
+    obtenerLigas, crearLiga, actualizarLiga, sumarIntegrante, restarIntegrante, actualizarPuntos, borrarLiga
 }
