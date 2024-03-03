@@ -8,6 +8,14 @@ const PartidoSchema = Schema({
         partidos: [{
             type: Number,
 
+            local: {
+                type: String
+            },
+
+            visitante: {
+                type: String
+            },
+            
             resultado: {
                 type: Number
             },

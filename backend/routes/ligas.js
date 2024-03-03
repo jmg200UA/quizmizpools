@@ -20,9 +20,8 @@ router.put('/:id',[
     validarCampos
 ], actualizarLiga);
 
-router.put('/sum/:id/:usuario',[ //COMO LO HACEMOS
+router.put('/sum/:id/',[
     check('id','el id no es valido').isMongoId(),
-    check('usuario','el id-usu no es valido').isMongoId(),
     validarCampos
 ], sumarIntegrante);
 

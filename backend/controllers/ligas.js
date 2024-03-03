@@ -127,80 +127,48 @@ const actualizarLiga = async(req, res) => {
         
 }
 
-const sumarIntegrante = async(req, res) => { //COMO LO HACEMOS
+const sumarIntegrante = async(req, res) => {
     
     const uid = req.params.id;
+    const { integrantes } = req.body;
 
     try{
         const existeLiga = await Liga.findById(uid);
+        const existeUsuario = await Usuario.findById(integrantes[0].integrante);
+        console.log("Integrante: ", integrantes[0].integrante);
 
-        if(!existeLiga){
+        var yaEstaIntegrante = 0;
+
+        if(!existeLiga || !existeUsuario){
 
             return res.status(400).json({
                 ok: false,
-                msg: 'La liga no existe'
+                msg: 'La liga o el usuario no existe'
             });       
+        }   
+
+        for (var j = 0; j < existeLiga.integrantes.length; j++) {
+            if (existeLiga.integrantes[j].integrante == integrantes[0].integrante) {                
+                console.log("Ya está el usuario en la liga"); 
+                yaEstaIntegrante = 1;               
+            }
+        }
+
+        if(yaEstaIntegrante==0){
+            console.log("Se introduce el usuario a la liga"); 
+            existeLiga.integrantes.push(integrantes[0]);
+            await existeLiga.save();
         }
         
+        console.log("Se introduce la liga al usuario");
+        existeUsuario.ligas.push(uid);
+        await existeUsuario.save();
 
-    let listaintegrantesinsertar = [];
-        
-
-        if (integrantes) {         
-            let listaintegrantesbusqueda = [];
-            for(var i=0; i<integrantes.length;i++){
-                console.log("Integrantes liga: " + integrantes[i].integrante);
-                if (integrantes[i]!=null) {
-                    const integranteId = new mongoose.Types.ObjectId(integrantes[i].integrante); 
-                    listaintegrantesbusqueda.push(integranteId);
-                    listaintegrantesinsertar.push(integranteId);
-                }
-            }
-            
-            console.log("Usuarios que existen: " + existenUsuarios);
-            if (existenUsuarios.length != listaintegrantesbusqueda.length) {
-                return res.status(400).json({
-                    ok: false,
-                    msg: 'Alguno de los usuarios no existen o están repetidos'
-                });
-            }
-            console.log("Listaintegrantes: " + listaintegrantesinsertar);
-
-            const liga = await Liga.findByIdAndUpdate(uid, req.body, {new: true});
-            
-            liga.integrantes.integrante = listaintegrantesinsertar;
-            await liga.save();
-
-            var hayliga = 0;
-
-            for(var i=0; i<existenUsuarios.length;i++){
-                if (existenUsuarios[i]!=null) {
-                    if(existenUsuarios[i].ligas.length<1){
-                        existenUsuarios[i].ligas.push(uid);                                
-                        await existenUsuarios[i].save();
-                    } 
-                    else{
-                        for(var j=0; j<existenUsuarios[i].ligas.length;j++){
-                            if(existenUsuarios[i].ligas[j]._id == uid){
-                                existenUsuarios[i].ligas[j] = liga;                                                            
-                                await existenUsuarios[i].save();
-                                hayliga=1;
-                            }                 
-                        }                        
-                        if(hayliga==0){
-                            existenUsuarios[i].ligas.push(uid);                                
-                            await existenUsuarios[i].save();
-                        }    
-                    }                   
-                }
-            }
-
-            res.json({
-                ok: true,
-                msg: 'Liga actualizada',
-                liga
-            });
-        }
+        res.json({
+            ok: true,
+            msg: 'Integrante sumado',
+            existeLiga
+        });     
        
 
     }catch(error){
@@ -208,7 +176,7 @@ const sumarIntegrante = async(req, res) => { //COMO LO HACEMOS
 
         return res.status(400).json({
             ok: false,
-            msg: 'Error actualizando liga'
+            msg: 'Error sumando integrante a la liga'
         });    
     }
 }
